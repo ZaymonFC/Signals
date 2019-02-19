@@ -15,6 +15,7 @@ const chalk = require('chalk')
 const figlet = require('figlet')
 const shell = require('shelljs')
 const fs = require('fs')
+const path = require('path')
 
 const welcome = () => {
   console.log(
@@ -54,7 +55,7 @@ const askQuestions = (collections) => {
 
 const getCollectionFileNames = () => {
   return new Promise((resolve, reject) => {
-    fs.readdir('./collections', (err, files) => {
+    fs.readdir(path.resolve(__dirname, './collections'), (err, files) => {
       if (err) { reject('Something went wrong reading collections directory. Does it exist?') }
 
       resolve(files)
@@ -71,7 +72,7 @@ const parseFileNames = (files) => {
 }
 
 const presentError = (error) => {
-  console.error(chalk.red(error))
+  console.error(chalk.yellow(error))
   process.exit(0)
 }
 
@@ -80,6 +81,21 @@ const wrapTryCatch1 = (f) => {
     try {
       return f(x)
     } catch (error) { presentError(error) }
+  }
+}
+
+
+const wrapPromiseCatch0 = (f) => {
+  return () => {
+    return f()
+    .catch(error => presentError(error))
+  }
+}
+
+const wrapPromiseCatch1 = (f) => {
+  return (x) => {
+    return f(x)
+    .catch(error => presentError(error))
   }
 }
 
@@ -94,19 +110,44 @@ const wrapPromiseCatch3 = (f) => {
   }
 }
 
-const wrapPromiseCatch0 = (f) => {
-  return () => {
-    return f()
-    .catch(error => presentError(error))
+const validateResponse = (response) => {
+  const message = response.message
+  if (!message || message === '') {
+    throw 'Message cannot be empty'
   }
 }
 
+const formatEntry = (type, message) => {
+  const formattedType = type.toUpperCase()
+  const now = new Date()
+  const iso8006String = now.toISOString()
+  const entry = `${formattedType}|${iso8006String}|${message}\n`
+  return entry
+}
+
+const messageWriter = (payload) => {
+  return new Promise((resolve, reject) => {
+    const filename = `./collections/${payload.collection}.md`
+    const entry = formatEntry(payload.type, payload.message)
+    const filePath = path.resolve(__dirname, filename)
+    
+    fs.appendFile(filePath, entry, (err) => {
+      if (err) reject(`Something happened trying to write a log to ${path}`)
+      resolve()
+    })
+  })  
+}
+
+const goodbye = () => {
+  console.log(chalk.blueBright('Entry Appended To Log'))
+}
 
 async function run() {
   // Construct safe functions
   const safeHandledFileNameParser = wrapTryCatch1(parseFileNames)
   const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames)
-  // const safeMessageWriter = wrapPromiseCatch3(messageWriter)
+  const safeMessageWriter = wrapPromiseCatch1(messageWriter)
+  const safeResponseValidator = wrapTryCatch1(validateResponse)
 
   welcome()
 
@@ -115,7 +156,16 @@ async function run() {
 
   const { COLLECTION, TYPE, MESSAGE } = await askQuestions(files)
 
+  const response = {
+    collection: COLLECTION,
+    type: TYPE,
+    message: MESSAGE,
+  }
 
+  safeResponseValidator(response)
+  safeMessageWriter(response)
+
+  goodbye()
 
 }
 
