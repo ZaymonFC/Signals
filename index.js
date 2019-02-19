@@ -9,11 +9,9 @@
 //            |___/                       
 // Author Zaymon Foulds-Cook © 2019
 
-
 const inquirer = require('inquirer')
 const chalk = require('chalk')
 const figlet = require('figlet')
-const shell = require('shelljs')
 const fs = require('fs')
 const path = require('path')
 
@@ -84,18 +82,17 @@ const wrapTryCatch1 = (f) => {
   }
 }
 
-
 const wrapPromiseCatch0 = (f) => {
   return () => {
     return f()
-    .catch(error => presentError(error))
+      .catch(error => presentError(error))
   }
 }
 
 const wrapPromiseCatch1 = (f) => {
   return (x) => {
     return f(x)
-    .catch(error => presentError(error))
+      .catch(error => presentError(error))
   }
 }
 
@@ -104,7 +101,7 @@ const wrapPromiseCatch3 = (f) => {
     return (y) => {
       return (z) => {
         return f(x, y, z)
-        .catch(error => presentError(error))
+          .catch(error => presentError(error))
       }
     }
   }
@@ -130,12 +127,12 @@ const messageWriter = (payload) => {
     const filename = `./collections/${payload.collection}.md`
     const entry = formatEntry(payload.type, payload.message)
     const filePath = path.resolve(__dirname, filename)
-    
+
     fs.appendFile(filePath, entry, (err) => {
       if (err) reject(`Something happened trying to write a log to ${path}`)
       resolve()
     })
-  })  
+  })
 }
 
 const goodbye = () => {
@@ -166,8 +163,6 @@ async function run() {
   safeMessageWriter(response)
 
   goodbye()
-
 }
-
 
 run()
