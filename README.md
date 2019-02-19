@@ -26,7 +26,8 @@ Getting started with signals is simple.
 - __Events__: Represent information log entries that are related to the signal you are tracking that may provide context or other information related to the signal. Events are __not__ signals and do not count towards any metric.
 
 ## Tool Roadmap
-- [] Log style console visualisation for a signal collection.
+- [x] Log style console visualisation for a signal collection.
+- [] Move functions into logical modules
 - [] Metrics and tallies
     - [] Signals Completed
     - [] Velocity
