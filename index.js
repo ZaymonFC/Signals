@@ -15,7 +15,7 @@ const figlet = require('figlet')
 const fs = require('fs')
 const path = require('path')
 
-const welcome = () => {
+function welcome() {
   console.log(
     chalk.green(
       figlet.textSync("Signals", {
@@ -28,7 +28,7 @@ const welcome = () => {
   console.log('\nWelcome to Signals: an event and signal log management CLI.\n')
 }
 
-const askQuestions = (collections) => {
+function askStandardFlowQuestions(collections) {
   const questions = [
     {
       name: 'COLLECTION',
@@ -51,7 +51,25 @@ const askQuestions = (collections) => {
   return inquirer.prompt(questions)
 }
 
-const getCollectionFileNames = () => {
+function askVisualisationFlowQuestions(collections) {
+  const questions = [
+    {
+      name: 'COLLECTION',
+      type: 'list',
+      message: 'Which signal collection would you like to visualise',
+      choices: collections,
+    },
+    {
+      name: 'VISTYPE',
+      type: 'list',
+      message: 'Choose your visualisation type',
+      choices: ['Log']
+    },
+  ]
+  return inquirer.prompt(questions)
+}
+
+function getCollectionFileNames() {
   return new Promise((resolve, reject) => {
     fs.readdir(path.resolve(__dirname, './collections'), (err, files) => {
       if (err) { reject('Something went wrong reading collections directory. Does it exist?') }
@@ -61,7 +79,7 @@ const getCollectionFileNames = () => {
   })
 }
 
-const parseFileNames = (files) => {
+function parseFileNames(files) {
   if (!files) { throw 'You don\'t have any collection markdown files in ./collections' }
 
   const markdownFiles = files.filter(f => f.includes('.md'))
@@ -69,12 +87,12 @@ const parseFileNames = (files) => {
   return trimmedFileNames
 }
 
-const presentError = (error) => {
+function presentError(error) {
   console.error(chalk.yellow(error))
   process.exit(0)
 }
 
-const wrapTryCatch1 = (f) => {
+function wrapTryCatch1(f) {
   return (x) => {
     try {
       return f(x)
@@ -82,21 +100,21 @@ const wrapTryCatch1 = (f) => {
   }
 }
 
-const wrapPromiseCatch0 = (f) => {
+function wrapPromiseCatch0(f) {
   return () => {
     return f()
       .catch(error => presentError(error))
   }
 }
 
-const wrapPromiseCatch1 = (f) => {
+function wrapPromiseCatch1(f) {
   return (x) => {
     return f(x)
       .catch(error => presentError(error))
   }
 }
 
-const wrapPromiseCatch3 = (f) => {
+function wrapPromiseCatch3(f) {
   return (x) => {
     return (y) => {
       return (z) => {
@@ -107,14 +125,14 @@ const wrapPromiseCatch3 = (f) => {
   }
 }
 
-const validateResponse = (response) => {
+function validateResponse(response) {
   const message = response.message
   if (!message || message === '') {
     throw 'Message cannot be empty'
   }
 }
 
-const formatEntry = (type, message) => {
+function formatEntry(type, message) {
   const formattedType = type.toUpperCase()
   const now = new Date()
   const iso8006String = now.toISOString()
@@ -122,11 +140,15 @@ const formatEntry = (type, message) => {
   return entry
 }
 
-const messageWriter = (payload) => {
+function collectionFilePath(collection) {
+  const relativePath = `./collections/${collection}.md`
+  return path.resolve(__dirname, relativePath)
+}
+
+function messageWriter(payload) {
   return new Promise((resolve, reject) => {
-    const filename = `./collections/${payload.collection}.md`
+    const filePath = collectionFilePath(payload.collection)
     const entry = formatEntry(payload.type, payload.message)
-    const filePath = path.resolve(__dirname, filename)
 
     fs.appendFile(filePath, entry, (err) => {
       if (err) reject(`Something happened trying to write a log to ${path}`)
@@ -135,34 +157,102 @@ const messageWriter = (payload) => {
   })
 }
 
-const goodbye = () => {
-  console.log(chalk.blueBright('Entry Appended To Log'))
+function goodbye(message) {
+  console.log(chalk.blueBright(message))
+  process.exit(0)
 }
 
-async function run() {
-  // Construct safe functions
-  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames)
-  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames)
-  const safeMessageWriter = wrapPromiseCatch1(messageWriter)
-  const safeResponseValidator = wrapTryCatch1(validateResponse)
+async function standardFlow() {
+  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
+  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safeMessageWriter = wrapPromiseCatch1(messageWriter);
+  const safeResponseValidator = wrapTryCatch1(validateResponse);
 
-  welcome()
+  // TODO: Compose these
+  let files = await safeGetCollectionFileNames();
+  files = safeHandledFileNameParser(files);
 
-  let files = await safeGetCollectionFileNames()
-  files = safeHandledFileNameParser(files)
-
-  const { COLLECTION, TYPE, MESSAGE } = await askQuestions(files)
-
+  const { COLLECTION, TYPE, MESSAGE } = await askStandardFlowQuestions(files);
+  
   const response = {
     collection: COLLECTION,
     type: TYPE,
     message: MESSAGE,
+  };
+
+  safeResponseValidator(response);
+  await safeMessageWriter(response);
+}
+
+async function readCollection(collectionName) {
+  return new Promise((resolve, reject) => {
+    const filePath = collectionFilePath(collectionName)
+
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) reject(`Error ingesting data from collection ${collectionName}`)
+      resolve(data)
+    })
+  })
+}
+
+const collectionIndex = {
+  type: 0,
+  date: 1,
+  message: 2,
+}
+
+function processCollectionData(data) {
+  const dataLines = data.split('\n')
+  const cleanedDataLines = dataLines.filter(s => s !== '')
+  
+  return cleanedDataLines.map((line) => {
+    const lineEntries = line.split('|')
+
+    return {
+      type: lineEntries[collectionIndex.type],
+      date: new Date(lineEntries[collectionIndex.date]),
+      message: lineEntries[collectionIndex.message],
+    }
+  })
+}
+
+function logCollectionEntries(entries) {
+  entries.forEach(e => {
+    console.log(chalk.green('-> '), `${e.date.toISOString()} -> ${e.message}`)
+  })
+}
+
+async function visualisationFlow() {
+  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
+  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safeReadCollection = wrapPromiseCatch1(readCollection)
+
+  // TODO: Compose these
+  let files = await safeGetCollectionFileNames();
+  files = safeHandledFileNameParser(files);
+
+  const { COLLECTION, VISTYPE } = await askVisualisationFlowQuestions(files)
+
+  // Compose these
+  const collectionData = await safeReadCollection(COLLECTION)
+  const collectionEntries = processCollectionData(collectionData)
+
+  logCollectionEntries(collectionEntries)
+}
+
+async function run() {
+  const args = process.argv.slice(2)
+  if (args.filter(a => a === '--visualise').length > 0) {
+    welcome()
+    await visualisationFlow()
+    goodbye('Goodbye! :>')
+  } else {
+    welcome()
+    await standardFlow()
+    goodbye('Entry Appended To Log')
   }
-
-  safeResponseValidator(response)
-  safeMessageWriter(response)
-
-  goodbye()
 }
 
 run()
+
+
