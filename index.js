@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 //   _____  _                       _      
 // /  ___|(_)                     | |     
 // \ `--.  _   __ _  _ __    __ _ | | ___ 
@@ -7,6 +8,7 @@
 //             __/ |                      
 //            |___/                       
 // Author Zaymon Foulds-Cook © 2019
+
 
 const inquirer = require('inquirer')
 const chalk = require('chalk')

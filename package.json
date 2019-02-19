@@ -4,7 +4,8 @@
   "description": "Little project to append entries to markdown files tracking activities",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./index.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "figlet": "^1.2.1",
     "inquirer": "^6.2.2",
     "shelljs": "^0.8.3"
+  },
+  "bin": {
+    "signals": "./index.js"
   }
 }
