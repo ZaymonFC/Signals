@@ -1,4 +1,15 @@
 # Signals - CLI to manage your progress
+```javascript
+//   _____  _                       _      
+// /  ___|(_)                     | |     
+// \ `--.  _   __ _  _ __    __ _ | | ___ 
+//  `--. \| | / _` || '_ \  / _` || |/ __|
+// /\__/ /| || (_| || | | || (_| || |\__ \
+// \____/ |_| \__, ||_| |_| \__,_||_||___/
+//             __/ |                      
+//            |___/                       
+```
+
 Signals is a filebased, _functional_ CLI to manage append only logs of signals and events.
 Signals is inspired by the concept of __Goals, Signals and Measures__ described here: [Goals, Signals and Measures](https://www.atlassian.com/team-playbook/plays/goals-signals-measures)
 
