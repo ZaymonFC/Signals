@@ -39,6 +39,16 @@ function visualisationFlowQuestions(collections) {
   ]
 }
 
+function creationFlowQuestions() {
+  return [
+    {
+      name: 'COLLECTION',
+      type: 'input',
+      message: 'What would you like to name your new signal collection?'
+    }
+  ]
+}
+
 function askQuestions(questions) {
   return inquirer.prompt(questions)
 }
@@ -46,5 +56,6 @@ function askQuestions(questions) {
 export {
   standardFlowQuestions,
   visualisationFlowQuestions,
+  creationFlowQuestions,
   askQuestions
 }

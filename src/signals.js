@@ -14,9 +14,9 @@ const path = require('path')
 
 import { wrapPromiseCatch0, wrapPromiseCatch1, wrapTryCatch1 } from './safeCurry'
 import { welcome, goodbye, logCollectionEntries } from './presentation'
-import { askQuestions, standardFlowQuestions, visualisationFlowQuestions } from './questions'
-import { getCollectionFileNames, entryAppender, readCollection } from './fileManipulation'
-import { validateResponse } from './validators'
+import { askQuestions, standardFlowQuestions, visualisationFlowQuestions, creationFlowQuestions } from './questions'
+import { getCollectionFileNames, entryAppender, readCollection, createCollectionFile } from './fileManipulation'
+import { validateResponse, validateAndParseNewCollectionName } from './validators'
 import { parseFileNames } from './parsers'
 
 function formatEntry(type, message) {
@@ -50,7 +50,7 @@ async function standardFlow() {
   // Compose these
   safeResponseValidator(response)
   const entry = formatEntry(response.type, response.message)
-  console.log(entry)
+
   await safeMessageWriter({ entry: entry, collection: response.collection})
 }
 
@@ -96,7 +96,23 @@ async function visualisationFlow() {
 }
 
 async function creationFlow() {
-  
+  const safeFileWriter = wrapPromiseCatch1(createCollectionFile)
+  const safeCollectionNameValidator = wrapTryCatch1(validateAndParseNewCollectionName)
+  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
+
+  const flowQuestions = creationFlowQuestions()
+  const { COLLECTION } = await askQuestions(flowQuestions)
+
+  let existingCollections = await safeGetCollectionFileNames()
+  existingCollections = safeHandledFileNameParser(existingCollections)
+
+  const collectionName = safeCollectionNameValidator({
+    collection: COLLECTION,
+    existingCollections: existingCollections
+  })
+
+  await safeFileWriter(collectionName)
 }
 
 async function run() {

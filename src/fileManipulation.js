@@ -39,7 +39,19 @@ function entryAppender(entry) {
 }
 
 function createCollectionFile(collectionName) {
-  
+  return new Promise((resolve, reject) => {
+    const filePath = collectionFilePath(collectionName)
+
+    fs.writeFile(filePath, '', (err) => {
+      if (err) reject (`Something went wrong creating the file ${collectionName}`)
+      resolve()
+    })
+  })
 }
 
-export { getCollectionFileNames, entryAppender, readCollection }
+export {
+  getCollectionFileNames,
+  entryAppender,
+  readCollection,
+  createCollectionFile,
+}

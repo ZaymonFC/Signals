@@ -22,8 +22,9 @@ Getting started with signals is simple.
 4. Add any `<signal-collection>.md` file to the collections folder. Where `<signal-collection>` is the name of your collection.
 5. Either use `npm start` to run the CLI in place or run 'npm link' to use `signals` on the command line anywhere. __Warning__: Build the project before running `npm link`.
 
-## Visualisation
-Currently by specifying `signals --visualise` you can produce a log view of any signal collection.
+## Arguments
+- `--visualise` will allow you to produce a log view of any signal collection.
+- `--create` will allow you to create a new collection.
 
 ## Message Types
 - __Signals__: Represent log entries that directly contribute to the signal that you are tracking.

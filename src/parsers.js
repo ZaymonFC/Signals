@@ -6,4 +6,8 @@ function parseFileNames(files) {
   return trimmedFileNames
 }
 
-export { parseFileNames }
+function parseNewCollectionName(collection) {
+  return collection.replace(' ', '-')
+}
+
+export { parseFileNames, parseNewCollectionName }
