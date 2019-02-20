@@ -24,6 +24,27 @@ function formatEntry(type, message) {
   return entry
 }
 
+const collectionIndex = {
+  type: 0,
+  date: 1,
+  message: 2,
+}
+
+function processCollectionData(data) {
+  const dataLines = data.split('\n')
+  const cleanedDataLines = dataLines.filter(s => s !== '')
+  
+  return cleanedDataLines.map((line) => {
+    const lineEntries = line.split('|')
+
+    return {
+      type: lineEntries[collectionIndex.type],
+      date: new Date(lineEntries[collectionIndex.date]),
+      message: lineEntries[collectionIndex.message],
+    }
+  })
+}
+
 async function standardFlow() {
   const safe_handledFileNameParser = wrapTryCatch1(parseFileNames);
   const safe_getCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
@@ -55,27 +76,6 @@ async function standardFlow() {
   const entry = formatEntry(response.type, response.message)
 
   await safe_messageWriter({ entry: entry, collection: response.collection})
-}
-
-const collectionIndex = {
-  type: 0,
-  date: 1,
-  message: 2,
-}
-
-function processCollectionData(data) {
-  const dataLines = data.split('\n')
-  const cleanedDataLines = dataLines.filter(s => s !== '')
-  
-  return cleanedDataLines.map((line) => {
-    const lineEntries = line.split('|')
-
-    return {
-      type: lineEntries[collectionIndex.type],
-      date: new Date(lineEntries[collectionIndex.date]),
-      message: lineEntries[collectionIndex.message],
-    }
-  })
 }
 
 async function visualisationFlow() {
