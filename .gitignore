@@ -86,3 +86,6 @@ typings/
 
 collections/*.md
 .DS_Store
+
+.vscode
+dist

@@ -18,8 +18,13 @@ Getting started with signals is simple.
 
 1. Clone this repository into a directory of your choosing.
 2. `npm install` to gather dependencies.
-3. Add any `<signal-collection>.md` file to the collections folder. Where `<signal-collection>` is the name of your collection.
-4. Either use `npm start` to run the CLI in place or run 'npm link' to use `signals` on the command line anywhere.
+3. `npm build` to build the project with Babel
+4. Add any `<signal-collection>.md` file to the collections folder. Where `<signal-collection>` is the name of your collection.
+5. Either use `npm start` to run the CLI in place or run 'npm link' to use `signals` on the command line anywhere. __Warning__: Build the project before running `npm link`.
+
+## Arguments
+- `--visualise` will allow you to produce a log view of any signal collection.
+- `--create` will allow you to create a new collection.
 
 ## Visualisation
 Currently by specifying `signals --visualise` you can produce a log view of any signal collection.
@@ -30,9 +35,13 @@ Currently by specifying `signals --visualise` you can produce a log view of any 
 
 ## Tool Roadmap
 - [x] Log style console visualisation for a signal collection.
-- [] Move functions into logical modules
-- [] Metrics and tallies
-    - [] Signals Completed
-    - [] Velocity
-    - [] Signal Value Graph
-    - [] Signal Velocity
+- [ ] Convert to es6 style imports
+- [ ] Allow command line argument for creation of new signal collections.
+- [ ] Move functions into logical modules
+- [ ] Metrics and tallies
+    - [ ] Signals Completed
+    - [ ] Velocity
+    - [ ] Signal Value Graph
+    - [ ] Signal Velocity
+- [ ] Tests and Test Coverage
+- [ ] CI
