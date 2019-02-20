@@ -26,22 +26,20 @@ Getting started with signals is simple.
 - `--visualise` will allow you to produce a log view of any signal collection.
 - `--create` will allow you to create a new collection.
 
-## Visualisation
-Currently by specifying `signals --visualise` you can produce a log view of any signal collection.
-
 ## Message Types
 - __Signals__: Represent log entries that directly contribute to the signal that you are tracking.
 - __Events__: Represent information log entries that are related to the signal you are tracking that may provide context or other information related to the signal. Events are __not__ signals and do not count towards any metric.
 
 ## Tool Roadmap
 - [x] Log style console visualisation for a signal collection.
-- [ ] Convert to es6 style imports
-- [ ] Allow command line argument for creation of new signal collections.
-- [ ] Move functions into logical modules
+- [x] Convert to es6 style imports
+- [x] Allow command line argument for creation of new signal collections.
+- [x] Move functions into logical modules
+- [ ] Create processing modules for more advanced metrics and groupings
 - [ ] Metrics and tallies
     - [ ] Signals Completed
-    - [ ] Velocity
     - [ ] Signal Value Graph
     - [ ] Signal Velocity
+    - [ ] Grouped Metrics
 - [ ] Tests and Test Coverage
 - [ ] CI
