@@ -9,10 +9,7 @@
 //            |___/                       
 // Author Zaymon Foulds-Cook © 2019
 
-const fs = require('fs')
-const path = require('path')
-
-import { wrapPromiseCatch0, wrapPromiseCatch1, wrapTryCatch1 } from './safeCurry'
+import { wrapPromiseCatch0, wrapPromiseCatch1, wrapTryCatch1 } from './safe_curry'
 import { welcome, goodbye, logCollectionEntries } from './presentation'
 import { askQuestions, standardFlowQuestions, visualisationFlowQuestions, creationFlowQuestions } from './questions'
 import { getCollectionFileNames, entryAppender, readCollection, createCollectionFile } from './fileManipulation'
@@ -28,14 +25,14 @@ function formatEntry(type, message) {
 }
 
 async function standardFlow() {
-  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
-  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
-  const safeMessageWriter = wrapPromiseCatch1(entryAppender);
-  const safeResponseValidator = wrapTryCatch1(validateResponse);
+  const safe_handledFileNameParser = wrapTryCatch1(parseFileNames);
+  const safe_getCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safe_messageWriter = wrapPromiseCatch1(entryAppender);
+  const safe_responseValidator = wrapTryCatch1(validateResponse);
 
   // TODO: Compose these
-  let files = await safeGetCollectionFileNames();
-  files = safeHandledFileNameParser(files);
+  let files = await safe_getCollectionFileNames();
+  files = safe_handledFileNameParser(files);
 
   if (!files || files.length === 0) {
     console.log('You do not have any signal collections.')
@@ -54,10 +51,10 @@ async function standardFlow() {
   };
 
   // Compose these
-  safeResponseValidator(response)
+  safe_responseValidator(response)
   const entry = formatEntry(response.type, response.message)
 
-  await safeMessageWriter({ entry: entry, collection: response.collection})
+  await safe_messageWriter({ entry: entry, collection: response.collection})
 }
 
 const collectionIndex = {
@@ -82,43 +79,43 @@ function processCollectionData(data) {
 }
 
 async function visualisationFlow() {
-  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
-  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
-  const safeReadCollection = wrapPromiseCatch1(readCollection)
+  const safe_handledFileNameParser = wrapTryCatch1(parseFileNames);
+  const safe_getCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safe_readCollection = wrapPromiseCatch1(readCollection)
 
   // TODO: Compose these
-  let files = await safeGetCollectionFileNames();
-  files = safeHandledFileNameParser(files);
+  let files = await safe_getCollectionFileNames();
+  files = safe_handledFileNameParser(files);
 
   // TODO: Compose these
   const flowQuestions = visualisationFlowQuestions(files)
   const { COLLECTION, VISTYPE } = await askQuestions(flowQuestions)
 
   // TODO: Compose these
-  const collectionData = await safeReadCollection(COLLECTION)
+  const collectionData = await safe_readCollection(COLLECTION)
   const collectionEntries = processCollectionData(collectionData)
 
   logCollectionEntries(collectionEntries)
 }
 
 async function creationFlow() {
-  const safeFileWriter = wrapPromiseCatch1(createCollectionFile)
-  const safeCollectionNameValidator = wrapTryCatch1(validateAndParseNewCollectionName)
-  const safeGetCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
-  const safeHandledFileNameParser = wrapTryCatch1(parseFileNames);
+  const safe_fileWriter = wrapPromiseCatch1(createCollectionFile)
+  const safe_collectionNameValidator = wrapTryCatch1(validateAndParseNewCollectionName)
+  const safe_getCollectionFileNames = wrapPromiseCatch0(getCollectionFileNames);
+  const safe_handledFileNameParser = wrapTryCatch1(parseFileNames);
 
   const flowQuestions = creationFlowQuestions()
   const { COLLECTION } = await askQuestions(flowQuestions)
 
-  let existingCollections = await safeGetCollectionFileNames()
-  existingCollections = safeHandledFileNameParser(existingCollections)
+  let existingCollections = await safe_getCollectionFileNames()
+  existingCollections = safe_handledFileNameParser(existingCollections)
 
-  const collectionName = safeCollectionNameValidator({
+  const collectionName = safe_collectionNameValidator({
     collection: COLLECTION,
     existingCollections: existingCollections
   })
 
-  await safeFileWriter(collectionName)
+  await safe_fileWriter(collectionName)
 }
 
 async function run() {
