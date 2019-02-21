@@ -37,6 +37,12 @@ async function standardFlow() {
   let files = await safeGetCollectionFileNames();
   files = safeHandledFileNameParser(files);
 
+  if (!files || files.length === 0) {
+    console.log('You do not have any signal collections.')
+    await creationFlow()
+    return await standardFlow()
+  }
+
   // TODO: Compose these
   const flowQuestions = standardFlowQuestions(files)
   const { COLLECTION, TYPE, MESSAGE } = await askQuestions(flowQuestions);
