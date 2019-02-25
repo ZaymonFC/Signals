@@ -26,7 +26,8 @@ function presentError(error) {
 
 function logCollectionEntries(entries) {
   entries.forEach(e => {
-    console.log(chalk.green('-> '), `${e.date.toISOString()} -> ${e.message}`)
+    const dateString = e.date.toISOString().replace('T', ' ').slice(0, -8)
+    console.log(chalk.green('-> '), `${dateString}`, chalk.blueBright(' : '), e.message)
   })
 }
 

@@ -33,8 +33,8 @@ function wrapPromiseCatch3(f) {
   }
 }
 
-module.exports = {
-  wrapTryCatch1,
+export {
   wrapPromiseCatch0,
   wrapPromiseCatch1,
+  wrapTryCatch1
 }
