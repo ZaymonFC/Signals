@@ -7,7 +7,7 @@ function parseFileNames(files) {
 }
 
 function parseNewCollectionName(collection) {
-  return collection.replace(' ', '-')
+  return collection.replace(/ /g, '-');
 }
 
 export { parseFileNames, parseNewCollectionName }

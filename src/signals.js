@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-//   _____  _                       _      
-// /  ___|(_)                     | |     
-// \ `--.  _   __ _  _ __    __ _ | | ___ 
+//   _____  _                       _
+// /  ___|(_)                     | |
+// \ `--.  _   __ _  _ __    __ _ | | ___
 //  `--. \| | / _` || '_ \  / _` || |/ __|
 // /\__/ /| || (_| || | | || (_| || |\__ \
 // \____/ |_| \__, ||_| |_| \__,_||_||___/
-//             __/ |                      
-//            |___/                       
+//             __/ |
+//            |___/
 // Author Zaymon Foulds-Cook © 2019
 
-import { wrapPromiseCatch0, wrapPromiseCatch1, wrapTryCatch1 } from './safe_curry'
+import { wrapPromiseCatch0, wrapPromiseCatch1, wrapTryCatch1 } from './safeCurry'
 import { welcome, goodbye, logCollectionEntries } from './presentation'
 import { askQuestions, standardFlowQuestions, visualisationFlowQuestions, creationFlowQuestions } from './questions'
 import { getCollectionFileNames, entryAppender, readCollection, createCollectionFile } from './fileManipulation'
@@ -33,7 +33,7 @@ const collectionIndex = {
 function processCollectionData(data) {
   const dataLines = data.split('\n')
   const cleanedDataLines = dataLines.filter(s => s !== '')
-  
+
   return cleanedDataLines.map((line) => {
     const lineEntries = line.split('|')
 
@@ -64,7 +64,7 @@ async function standardFlow() {
   // TODO: Compose these
   const flowQuestions = standardFlowQuestions(files)
   const { COLLECTION, TYPE, MESSAGE } = await askQuestions(flowQuestions);
-  
+
   const response = {
     collection: COLLECTION,
     type: TYPE,
